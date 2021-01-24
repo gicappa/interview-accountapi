@@ -1,6 +1,10 @@
 version: '3'
 
 services:
+  accountclient:
+    build: ./accountclient
+    depends_on:
+      - accountapi
   accountapi:
     image: form3tech/interview-accountapi:v1.0.0-4-g63cf8434
     restart: on-failure
