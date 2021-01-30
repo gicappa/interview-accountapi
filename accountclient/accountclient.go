@@ -1,4 +1,4 @@
-package main
+package accountclient
 
 import "fmt"
 
@@ -8,7 +8,7 @@ func main() {
 
 // REST is meant to manage the requests at HTTP level
 type REST interface {
-	Post(uri string, account Account) (int, error)
+	Post(uri string, account *Account) (int, error)
 }
 
 // DefaultREST implementation of the RESTClient interface
@@ -27,7 +27,7 @@ type AccountClient struct {
 }
 
 // CreateAccount creates a new account in the API
-func (a *AccountClient) CreateAccount(account Account) {
+func (a *AccountClient) CreateAccount(account *Account) {
 	a.rest.Post("/v1/organisation/accounts", account)
 	return
 }

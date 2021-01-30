@@ -1,4 +1,4 @@
-package main
+package accountclient
 
 import (
 	"testing"
@@ -10,19 +10,19 @@ type MockREST struct {
 	mock.Mock
 }
 
-func (o *MockREST) Post(uri string, account Account) (int, error) {
+func (o *MockREST) Post(uri string, account *Account) (int, error) {
 	args := o.Called(uri, account)
 	return args.Int(0), args.Error(1)
 }
 
 func TestCreateAccount(t *testing.T) {
-	rest := new(MockREST)
-	client := &AccountClient{rest}
-	account := &Account{"IT"}
+	rest := MockREST{}
+	client := AccountClient{&rest}
+	account := Account{"IT"}
 
-	rest.On("Post", "/v1/organisation/accounts", *account).Return(1, nil)
+	rest.On("Post", "/v1/organisation/accounts", &account).Return(1, nil)
 
-	client.CreateAccount(*account)
+	client.CreateAccount(&account)
 
 	rest.AssertExpectations(t)
 }
