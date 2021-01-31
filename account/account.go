@@ -1,10 +1,6 @@
-package accountclient
+package account
 
 import "fmt"
-
-func main() {
-	fmt.Println("Account Client")
-}
 
 // REST is meant to manage the requests at HTTP level
 type REST interface {
