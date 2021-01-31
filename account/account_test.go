@@ -1,4 +1,4 @@
-package accountclient
+package account
 
 import (
 	"testing"
