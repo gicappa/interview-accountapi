@@ -48,6 +48,13 @@ To do so I read a lot of blogpost and also some github code to better understand
 major projects are behaving (e.g. https://www.wolfe.id.au/2020/03/10/how-do-i-structure-my-go-project/) 
 and to have an idea on how an idiomatic golang codebase looks like.
 
+After studying golang and digging in the details of the ecosystem, I needed a CI/CD system to code properly.
+Therefore, I configured the github actions to:
+- launch the `docker-compose-tests.yml` from the pipeline
+- build the software and launch the tests
+
+The `docker-compose-tests.yml` file is the docker compose file that is not launching 
+the client part I developed. 
 ----
 # Form3 Take Home Exercise
 
