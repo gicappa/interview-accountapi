@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-  accountclient:
-    build: ./accountclient
+  account:
+    build: .
     depends_on:
       - accountapi
   accountapi:

@@ -1,3 +1,54 @@
+# Gian Carlo Pace
+It's the first time I approach golang.
+
+## My first steps in go. Random thoughts (31/01/2021)
+### A new language
+When I approach a new programming language, I try immediately to write some simple 
+program that works: it is so rewarding to get a software running! 
+But after a few hours, I start immediately to hit the hard ceiling of my limited knowledge.
+
+That happened also approaching golang. 
+I knew nothing about the ecosystem and libraries, about know how to build 
+a more complex application, about how to create modules, about how to test the code.
+
+This is where the path get steeper and it corresponds with the moment when I need to 
+put some grounds where to build my knowledge before continuing on coding. So I started 
+reading an the introductory book http://www.golang-book.com/books/intro. 
+It's very basic and it is addressed to a very unexperienced software developer but,
+skipping the really introductory information on what a function and a method are,
+it puts all the starting concepts of the language one after the other. 
+
+After a quick read I have more instruments to create the design I prefer and to 
+be a bit more idiomatic in the usage of the language (avoiding some java-ish drifts).
+
+## Growing Object-Oriented Software, Guided by Tests
+One of my favourites books that shaped the way I write software is Growing Object-Oriented 
+Software, Guided by Tests [GOOS01].
+I really value this book as a great tool to build software at a sustainable pace.
+
+In a nutshell the steps to build the software should be:
+- Create a walking skeleton
+- Write an acceptance test (fully integrated) that demonstrate the featrure the customer needs
+- Write an incremental set of unit tests to make the acceptance test pass 
+- Loop creating a new acceptance test
+
+So I started from the first point.
+
+[GOOS01] http://www.growing-object-oriented-software.com/
+
+# Creating a walking skeleton
+To create a walking skeleton I needed to know:
+- How structure the code in the repository 
+- how to build the code (with all the complications of the naming conventions)
+- how to use the module system (confusion for the env var setup)
+- how to create an launch tests for the whole application
+- how to use mocks (that is really complicated confronted to Java)
+
+To do so I read a lot of blogpost and also some github code to better understand how the 
+major projects are behaving (e.g. https://www.wolfe.id.au/2020/03/10/how-do-i-structure-my-go-project/) 
+and to have an idea on how an idiomatic golang codebase looks like.
+
+----
 # Form3 Take Home Exercise
 
 ## Instructions
