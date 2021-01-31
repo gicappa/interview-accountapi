@@ -1,7 +1,5 @@
 package account
 
-import "fmt"
-
 // REST is meant to manage the requests at HTTP level
 type REST interface {
 	Post(uri string, account *Account) (int, error)
