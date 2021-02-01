@@ -1,26 +1,28 @@
 package account
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 )
 
-type MockREST struct {
-	mock.Mock
-}
+var rest MockREST
+var client Client
 
-func (o *MockREST) Post(uri string, data []byte) (int, error) {
-	args := o.Called(uri, data)
-	return args.Int(0), args.Error(1)
-}
-
-func TestCreateAccount(t *testing.T) {
-	rest := MockREST{}
-	client := Client{&rest}
-	account := Account{"IT"}
-
+func TestMain(m *testing.M) {
+	rest = MockREST{}
+	client = Client{&rest}
 	rest.On("Post", "/v1/organisation/accounts", mock.Anything).Return(1, nil)
+	os.Exit(m.Run())
+}
+
+// Acceptance Tests
+
+// Testing the end-to-end creation of an account using the
+// accountapi.
+func TestCreateAccount(t *testing.T) {
+	account := Account{"IT"}
 
 	client.CreateAccount(&account)
 
