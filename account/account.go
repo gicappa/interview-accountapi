@@ -1,23 +1,27 @@
 package account
 
-// REST is meant to manage the requests at HTTP level
-type REST interface {
-	Post(uri string, data []byte) (int, error)
-}
-
-// DefaultREST implementation of the RESTClient interface
-type DefaultREST struct {
-}
+import r "github.com/gicappa/interview-accountapi/rest"
 
 // Account holds the account data
 type Account struct {
-	country string
+	Data struct {
+		Type           string `json:"type"`
+		ID             string `json:"id"`
+		OrganisationID string `json:"organisation_id"`
+		Attributes     struct {
+			Country      string `json:"country"`
+			BaseCurrency string `json:"base_currency"`
+			BankID       string `json:"bank_id"`
+			BankIDCode   string `json:"bank_id_code"`
+			Bic          string `json:"bic"`
+		} `json:"attributes"`
+	} `json:"data"`
 }
 
 // Client is the client that allows to marshal and unmarshal
 // the objects
 type Client struct {
-	rest REST
+	rest r.REST
 }
 
 // CreateAccount creates a new account in the API

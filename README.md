@@ -45,7 +45,7 @@ To create a walking skeleton I needed to know:
 - how to use mocks (that is really complicated confronted to Java)
 
 To do so I read a lot of blogpost and also some github code to better understand how the 
-major projects are behaving (e.g. https://www.wolfe.id.au/2020/03/10/how-do-i-structure-my-go-project/) 
+major projects are behaving (e.g. https://www.wolfe.id.au/2020/03/10/how-do-i-structure-my-go-project/, https://github.com/golang-standards/project-layout) 
 and to have an idea on how an idiomatic golang codebase looks like.
 
 After studying golang and digging in the details of the ecosystem, I needed a CI/CD system to code properly.
