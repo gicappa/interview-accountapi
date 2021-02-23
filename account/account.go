@@ -24,7 +24,17 @@ type Client struct {
 	rest r.REST
 }
 
-// CreateAccount creates a new account in the API
-func (a *Client) CreateAccount(account *Account) {
-	a.rest.Post("/v1/organisation/accounts", nil)
+// NewClient creates a new object that will help in
+// translating commmands in code to HTTP requests
+func NewClient() *Client {
+	return &Client{
+		rest: nil,
+	}
 }
+
+// // CreateAccount creates a new account in the API
+// func (c *Client) CreateAccount(account *Account) (a *Account, err error) {
+// 	c.rest.Post("/v1/organisation/accounts", nil)
+
+// 	return &Account{}, nil
+// }
