@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 var client Client
@@ -77,6 +78,13 @@ func Test_CreateNewClient(t *testing.T) {
 	assert.NotNil(t, client)
 }
 
+func Test_CreateNewClientWitRESTClient(t *testing.T) {
+	mock := MockREST{}
+	client := Client{rest: &mock}
+
+	assert.NotNil(t, client)
+}
+
 // func Test_ClientCreateAnAccount(t *testing.T) {
 // 	client := NewClient()
 
@@ -88,14 +96,14 @@ func Test_CreateNewClient(t *testing.T) {
 // Micro/Unit tests ///////////////////////////////////////////////////
 // var rest MockREST
 
-// type MockREST struct {
-// 	mock.Mock
-// }
+type MockREST struct {
+	mock.Mock
+}
 
-// func (o *MockREST) Post(uri string, data []byte) (int, error) {
-// 	args := o.Called(uri, data)
-// 	return args.Int(0), args.Error(1)
-// }
+func (o *MockREST) Post(uri string, data []byte) (int, error) {
+	args := o.Called(uri, data)
+	return args.Int(0), args.Error(1)
+}
 
 // // Setup of the mocks and collaborators in the test
 // func TestMain(m *testing.M) {

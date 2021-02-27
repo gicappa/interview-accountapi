@@ -8,3 +8,7 @@ type REST interface {
 // DefaultREST implementation of the RESTClient interface
 type DefaultREST struct {
 }
+
+func (o *DefaultREST) Post(uri string, data []byte) (int, error) {
+	return 0, nil
+}

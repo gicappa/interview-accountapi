@@ -28,7 +28,7 @@ type Client struct {
 // translating commmands in code to HTTP requests
 func NewClient() *Client {
 	return &Client{
-		rest: nil,
+		rest: &r.DefaultREST{},
 	}
 }
 
