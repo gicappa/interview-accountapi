@@ -1,13 +1,15 @@
 package account
 
-import r "github.com/gicappa/interview-accountapi/rest"
+import (
+	"encoding/json"
 
-// Account
-// =======
-// An Account represents a bank account that is registered
+	r "github.com/gicappa/interview-accountapi/rest"
+)
+
+// Account represents a bank account that is registered
 // with Form3. It is used to validate and allocate inbound
 // payments.
-//
+
 // Client is the base structure that is able to translate the
 // golang methods into RESTful calls. It holds a rest client
 // structure to ease the translation of the command in HTTP
@@ -43,7 +45,21 @@ func NewClient() *Client {
 // Note that a given bank_id and bic need to be registered
 // with Form3 and connected to your organisation ID.
 func (c *Client) Create(country string, bankID string, bankIDCode string, BIC string) (a *Account, err error) {
-	return &Account{}, nil
+	response, _ := c.rest.Post("/v1/organisation/accounts", nil)
+
+	var ad accountData
+	error := json.Unmarshal([]byte(response), &ad)
+	if error != nil {
+		return nil, error
+	}
+
+	account := &Account{
+		accountNumber: ad.Data.Attributes.AccountNumber,
+		IBAN:          ad.Data.Attributes.Iban,
+		status:        ad.Data.Attributes.Status,
+	}
+
+	return account, nil
 }
 
 // Account is the data structure holding account data
@@ -54,25 +70,26 @@ type Account struct {
 	IBAN          string
 }
 
-// // CreateAccount creates a new account in the API
-// func (c *Client) CreateAccount(account *Account) (a *Account, err error) {
-// 	c.rest.Post("/v1/organisation/accounts", nil)
-
-// 	return &Account{}, nil
-// }
-
-// Account holds the account data
-// type Account struct {
-// 	Data struct {
-// 		Type           string `json:"type"`
-// 		ID             string `json:"id"`
-// 		OrganisationID string `json:"organisation_id"`
-// 		Attributes     struct {
-// 			Country      string `json:"country"`
-// 			BaseCurrency string `json:"base_currency"`
-// 			BankID       string `json:"bank_id"`
-// 			BankIDCode   string `json:"bank_id_code"`
-// 			Bic          string `json:"bic"`
-// 		} `json:"attributes"`
-// 	} `json:"data"`
-// }
+// AccountData is a data structure that will contain
+// the json data in the response.
+type accountData struct {
+	Data struct {
+		Type           string `json:"type"`
+		ID             string `json:"id"`
+		Version        int    `json:"version"`
+		OrganisationID string `json:"organisation_id"`
+		Attributes     struct {
+			AccountNumber string `json:"account_number"`
+			Iban          string `json:"iban"`
+			Status        string `json:"status"`
+		} `json:"attributes"`
+		Relationships struct {
+			AccountEvents struct {
+				Data []struct {
+					Type string `json:"type"`
+					ID   string `json:"id"`
+				} `json:"data"`
+			} `json:"account_events"`
+		} `json:"relationships"`
+	} `json:"data"`
+}
