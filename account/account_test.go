@@ -48,24 +48,37 @@ type MockREST struct {
 	mock.Mock
 }
 
-func (o *MockREST) Post(uri string, data []byte) (string, error) {
+func (o *MockREST) Post(uri, data string) (string, error) {
 	args := o.Called(uri, data)
 	return args.String(0), args.Error(1)
 }
 
+var mockRest MockREST
+
 func NewMockClient() Client {
-	mockRest := MockREST{}
-	mockRest.On("Post", "/v1/organisation/accounts", mock.Anything).Return(accountResponse(), nil)
+	mockRest = MockREST{}
 	return Client{rest: &mockRest}
 }
 
-func TestCreate_account_mock(t *testing.T) {
+func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
 	client := NewMockClient()
+	mockRest.On("Post", "/v1/organisation/accounts", mock.AnythingOfType("string")).Return(accountResponse(), nil)
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 	assert.Equal(t, account.accountNumber, "41426819")
 	assert.Equal(t, account.status, "confirmed")
 	assert.Equal(t, account.IBAN, "GB11NWBK40030041426819")
+}
+
+func TestCreate_account_marshal_json_in_request(t *testing.T) {
+	client := NewMockClient()
+	mockRest.On("Post", "/v1/organisation/accounts", mock.AnythingOfType("string")).Return(accountResponse(), nil)
+
+	const expected = `{"data":{"type":"accounts","id":"replace-me","organisation_id":"replace-me","attributes":{"country":"GB","base_currency":"GPB","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
+	client.Create("GB", "400300", "GBDSC", "NWBKGB22")
+
+	mockRest.AssertCalled(t, "Post", "/v1/organisation/accounts", expected)
+	mock.AssertExpectationsForObjects(t, &mockRest)
 }
 
 func accountResponse() string {

@@ -45,7 +45,25 @@ func NewClient() *Client {
 // Note that a given bank_id and bic need to be registered
 // with Form3 and connected to your organisation ID.
 func (c *Client) Create(country string, bankID string, bankIDCode string, BIC string) (a *Account, err error) {
-	response, _ := c.rest.Post("/v1/organisation/accounts", nil)
+
+	request := &Request{
+		Data: Data{
+			Type:           "accounts",
+			ID:             "replace-me",
+			OrganisationID: "replace-me",
+			Attributes: Attributes{
+				Country:      country,
+				BaseCurrency: "GPB",
+				BankID:       bankID,
+				BankIDCode:   bankIDCode,
+				Bic:          BIC,
+			},
+		},
+	}
+
+	requestString, _ := json.Marshal(request)
+
+	response, _ := c.rest.Post("/v1/organisation/accounts", string(requestString))
 
 	var ad accountData
 	error := json.Unmarshal([]byte(response), &ad)
@@ -92,4 +110,26 @@ type accountData struct {
 			} `json:"account_events"`
 		} `json:"relationships"`
 	} `json:"data"`
+}
+
+// Request holds the request data
+type Request struct {
+	Data Data `json:"data"`
+}
+
+// Attributes of the account
+type Attributes struct {
+	Country      string `json:"country"`
+	BaseCurrency string `json:"base_currency"`
+	BankID       string `json:"bank_id"`
+	BankIDCode   string `json:"bank_id_code"`
+	Bic          string `json:"bic"`
+}
+
+// Data of the account request
+type Data struct {
+	Type           string     `json:"type"`
+	ID             string     `json:"id"`
+	OrganisationID string     `json:"organisation_id"`
+	Attributes     Attributes `json:"attributes"`
 }
