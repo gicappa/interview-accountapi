@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	r "github.com/gicappa/interview-accountapi/rest"
+	"github.com/google/uuid"
 )
 
 // Account represents a bank account that is registered
@@ -15,15 +16,19 @@ import (
 // structure to ease the translation of the command in HTTP
 // verbs
 type Client struct {
-	rest r.REST
+	ID             string
+	OrganisationID string
+	rest           r.REST
 }
 
 // NewClient is a function that creates a new object obejct
 // injecting the rest client to the DefaultREST client that
 // is actually performing the requests to the API layer.
-func NewClient() *Client {
+func NewClient(organisationID string) *Client {
 	return &Client{
-		rest: &r.DefaultREST{},
+		ID:             uuid.NewString(),
+		OrganisationID: organisationID,
+		rest:           &r.DefaultREST{},
 	}
 }
 
@@ -49,8 +54,8 @@ func (c *Client) Create(country string, bankID string, bankIDCode string, BIC st
 	request := &Request{
 		Data: Data{
 			Type:           "accounts",
-			ID:             "replace-me",
-			OrganisationID: "replace-me",
+			ID:             c.ID,
+			OrganisationID: c.OrganisationID,
 			Attributes: Attributes{
 				Country:      country,
 				BaseCurrency: "GPB",

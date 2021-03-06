@@ -3,6 +3,7 @@ module github.com/gicappa/interview-accountapi
 go 1.15
 
 require (
+	github.com/google/uuid v1.2.0
 	github.com/stretchr/testify v1.6.1
 	go101.org/golds v0.1.9 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect

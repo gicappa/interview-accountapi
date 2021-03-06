@@ -15,7 +15,7 @@ var client Client
 // of the account client libraries connecting to the APIs
 // provided by the docker-compose docker images.
 func TestNewClient(t *testing.T) {
-	client := NewClient()
+	client := NewClient("ACME")
 
 	assert.NotNil(t, client)
 }
@@ -33,7 +33,7 @@ func TestNewClient(t *testing.T) {
 // - IBAN: Generated if not provided
 func TestCreate_account_GB(t *testing.T) {
 	t.Skip("WIP: Acceptance test will pass when all the unit tests will be ok")
-	client := NewClient()
+	client := NewClient("ACME")
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 
@@ -57,7 +57,10 @@ var mockRest MockREST
 
 func NewMockClient() Client {
 	mockRest = MockREST{}
-	return Client{rest: &mockRest}
+	return Client{
+		ID:             "my-id",
+		OrganisationID: "ACME",
+		rest:           &mockRest}
 }
 
 func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
@@ -72,12 +75,15 @@ func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
 
 func TestCreate_account_marshal_json_in_request(t *testing.T) {
 	client := NewMockClient()
+
 	mockRest.On("Post", "/v1/organisation/accounts", mock.AnythingOfType("string")).Return(accountResponse(), nil)
 
-	const expected = `{"data":{"type":"accounts","id":"replace-me","organisation_id":"replace-me","attributes":{"country":"GB","base_currency":"GPB","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
 	client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 
+	const expected = `{"data":{"type":"accounts","id":"my-id","organisation_id":"ACME","attributes":{"country":"GB","base_currency":"GPB","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
+
 	mockRest.AssertCalled(t, "Post", "/v1/organisation/accounts", expected)
+
 	mock.AssertExpectationsForObjects(t, &mockRest)
 }
 
@@ -111,21 +117,3 @@ func accountResponse() string {
 	}
 }`
 }
-
-// // Setup of the mocks and collaborators in the test
-// func TestMain(m *testing.M) {
-// 	rest = MockREST{}
-// 	client = Client{&rest}
-// 	rest.On("Post", "/v1/organisation/accounts", mock.Anything).Return(1, nil)
-// 	os.Exit(m.Run())
-// }
-
-// // Testing the end-to-end creation of an account using the
-// // accountapi. This test is done before starting
-// func TestCreateAccount(t *testing.T) {
-// 	// account := Account{}
-
-// 	// client.CreateAccount(&account)
-
-// 	// rest.AssertExpectations(t)
-// }
