@@ -11,6 +11,8 @@ import (
 // with Form3. It is used to validate and allocate inbound
 // payments.
 
+const REST_ACCOUNT_URL = "/v1/organisation/accounts"
+
 // Client is the base structure that is able to translate the
 // golang methods into RESTful calls. It holds a rest client
 // structure to ease the translation of the command in HTTP
@@ -49,8 +51,33 @@ func NewClient(organisationID string) *Client {
 // left empty.
 // Note that a given bank_id and bic need to be registered
 // with Form3 and connected to your organisation ID.
-func (c *Client) Create(country string, bankID string, bankIDCode string, BIC string) (a *Account, err error) {
+func (c *Client) Create(country, bankID, bankIDCode, BIC string) (a *Account, err error) {
+	jsonRequest, err := c.marshalRequest(country, bankID, bankIDCode, BIC)
+	if err != nil {
+		return nil, err
+	}
 
+	jsonResponse, err := c.rest.Post(REST_ACCOUNT_URL, jsonRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	ad, err := c.unmarshalResponse(jsonResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	account := &Account{
+		accountNumber: ad.Data.Attributes.AccountNumber,
+		IBAN:          ad.Data.Attributes.Iban,
+		status:        ad.Data.Attributes.Status,
+	}
+
+	return account, err
+}
+
+// marshalRequest create a JSON string out of the request params
+func (c *Client) marshalRequest(country, bankID, bankIDCode, BIC string) (string, error) {
 	request := &Request{
 		Data: Data{
 			Type:           "accounts",
@@ -66,23 +93,16 @@ func (c *Client) Create(country string, bankID string, bankIDCode string, BIC st
 		},
 	}
 
-	requestString, _ := json.Marshal(request)
+	requestString, err := json.Marshal(request)
 
-	response, _ := c.rest.Post("/v1/organisation/accounts", string(requestString))
+	return string(requestString), err
+}
 
-	var ad accountData
-	error := json.Unmarshal([]byte(response), &ad)
-	if error != nil {
-		return nil, error
-	}
+// unmarshalResponse retuns a JSON string out of the request params
+func (c *Client) unmarshalResponse(jsonString string) (ad accountData, err error) {
+	err = json.Unmarshal([]byte(jsonString), &ad)
 
-	account := &Account{
-		accountNumber: ad.Data.Attributes.AccountNumber,
-		IBAN:          ad.Data.Attributes.Iban,
-		status:        ad.Data.Attributes.Status,
-	}
-
-	return account, nil
+	return ad, err
 }
 
 // Account is the data structure holding account data
