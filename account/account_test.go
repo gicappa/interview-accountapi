@@ -15,7 +15,7 @@ var client Client
 // of the account client libraries connecting to the APIs
 // provided by the docker-compose docker images.
 func TestNewClient(t *testing.T) {
-	client := NewClient("ACME")
+	client := NewClient("http://localhost:8080", "634e3a41-26b8-49f9-a23d-26fa92061f38")
 
 	assert.NotNil(t, client)
 }
@@ -32,12 +32,10 @@ func TestNewClient(t *testing.T) {
 // - Account Number: optional, 8 characters, generated if not provided
 // - IBAN: Generated if not provided
 func TestCreate_account_GB(t *testing.T) {
-	t.Skip("WIP: Acceptance test will pass when all the unit tests will be ok")
-	client := NewClient("ACME")
+	client := NewClient("http://localhost:8080", "634e3a41-26b8-49f9-a23d-26fa92061f38")
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 
-	assert.Equal(t, account.status, "confirmed")
 	assert.NotNil(t, account.accountNumber)
 	assert.NotNil(t, account.IBAN)
 }
@@ -59,8 +57,8 @@ func NewMockClient() Client {
 	mockRest = MockREST{}
 	return Client{
 		ID:             "my-id",
-		OrganisationID: "ACME",
-		rest:           &mockRest}
+		OrganisationID: "634e3a41-26b8-49f9-a23d-26fa92061f38",
+		Rest:           &mockRest}
 }
 
 func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
@@ -69,7 +67,6 @@ func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 	assert.Equal(t, account.accountNumber, "41426819")
-	assert.Equal(t, account.status, "confirmed")
 	assert.Equal(t, account.IBAN, "GB11NWBK40030041426819")
 }
 
@@ -80,7 +77,7 @@ func TestCreate_account_marshal_json_in_request(t *testing.T) {
 
 	client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 
-	const expected = `{"data":{"type":"accounts","id":"my-id","organisation_id":"ACME","attributes":{"country":"GB","base_currency":"GPB","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
+	const expected = `{"data":{"type":"accounts","id":"my-id","organisation_id":"634e3a41-26b8-49f9-a23d-26fa92061f38","attributes":{"country":"GB","base_currency":"GBP","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
 
 	mockRest.AssertCalled(t, "Post", "/v1/organisation/accounts", expected)
 
@@ -94,7 +91,7 @@ func accountResponse() string {
 		"type": "accounts",
 		"id": "ad27e265-9605-4b4b-a0e5-3003ea9cc4dc",
 		"version": 0,
-		"organisation_id": "eb0bd6f5-c3f5-44b2-b677-acd23cdde73c",
+		"organisation_id": "634e3a41-26b8-49f9-a23d-26fa92061f38",
 		"attributes": {
 			"account_number": "41426819",
 			"iban": "GB11NWBK40030041426819",

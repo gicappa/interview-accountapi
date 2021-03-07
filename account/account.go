@@ -11,7 +11,8 @@ import (
 // with Form3. It is used to validate and allocate inbound
 // payments.
 
-const REST_ACCOUNT_URL = "/v1/organisation/accounts"
+// AccountURI is the URI defining the REST resource of the account
+const AccountURI = "/v1/organisation/accounts"
 
 // Client is the base structure that is able to translate the
 // golang methods into RESTful calls. It holds a rest client
@@ -20,17 +21,17 @@ const REST_ACCOUNT_URL = "/v1/organisation/accounts"
 type Client struct {
 	ID             string
 	OrganisationID string
-	rest           r.REST
+	Rest           r.REST
 }
 
 // NewClient is a function that creates a new object obejct
 // injecting the rest client to the DefaultREST client that
 // is actually performing the requests to the API layer.
-func NewClient(organisationID string) *Client {
+func NewClient(baseURL, organisationID string) *Client {
 	return &Client{
 		ID:             uuid.NewString(),
 		OrganisationID: organisationID,
-		rest:           &r.DefaultREST{},
+		Rest:           &r.DefaultREST{BaseURL: baseURL},
 	}
 }
 
@@ -57,7 +58,7 @@ func (c *Client) Create(country, bankID, bankIDCode, BIC string) (a *Account, er
 		return nil, err
 	}
 
-	jsonResponse, err := c.rest.Post(REST_ACCOUNT_URL, jsonRequest)
+	jsonResponse, err := c.Rest.Post(AccountURI, jsonRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (c *Client) marshalRequest(country, bankID, bankIDCode, BIC string) (string
 			OrganisationID: c.OrganisationID,
 			Attributes: Attributes{
 				Country:      country,
-				BaseCurrency: "GPB",
+				BaseCurrency: "GBP",
 				BankID:       bankID,
 				BankIDCode:   bankIDCode,
 				Bic:          BIC,
