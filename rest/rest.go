@@ -2,6 +2,8 @@ package rest
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,23 +23,26 @@ type DefaultREST struct {
 // TODO missing header handling
 func (o *DefaultREST) Post(uri, data string) (string, error) {
 	req := bytes.NewBuffer([]byte(data))
-
-	resp, err := http.Post(o.BaseURL+uri, "application/vnd.api+json", req)
+	res, err := http.Post(o.BaseURL+uri, "application/vnd.api+json", req)
 
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+		log.Fatalf("ERROR|Post|%v", err)
 		return "", err
 	}
 
-	defer resp.Body.Close()
+	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("ERROR|ReadBody|%v", err)
 		return "", err
 	}
 
-	log.Println(string(body))
+	if res.StatusCode != 201 {
+		return "", errors.New("ERROR|StatusCode|" + fmt.Sprint(res.StatusCode) + "|Body|" + string(body))
+	}
+
+	log.Printf("INFO|%s", string(body))
 
 	return string(body), nil
 }

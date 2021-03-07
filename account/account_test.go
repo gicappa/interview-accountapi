@@ -35,13 +35,11 @@ func TestCreate_account_GB(t *testing.T) {
 	client := NewClient("http://localhost:8080", "634e3a41-26b8-49f9-a23d-26fa92061f38")
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
-
 	assert.NotNil(t, account.accountNumber)
 	assert.NotNil(t, account.IBAN)
 }
 
-// Micro/Unit tests ///////////////////////////////////////////////////
-// var rest MockREST
+// Micro/Unit tests
 type MockREST struct {
 	mock.Mock
 }
@@ -55,6 +53,8 @@ var mockRest MockREST
 
 func NewMockClient() Client {
 	mockRest = MockREST{}
+	mockRest.On("Post", "/v1/organisation/accounts", mock.AnythingOfType("string")).
+		Return(accountResponse(), nil)
 	return Client{
 		ID:             "my-id",
 		OrganisationID: "634e3a41-26b8-49f9-a23d-26fa92061f38",
@@ -63,7 +63,6 @@ func NewMockClient() Client {
 
 func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
 	client := NewMockClient()
-	mockRest.On("Post", "/v1/organisation/accounts", mock.AnythingOfType("string")).Return(accountResponse(), nil)
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
 	assert.Equal(t, account.accountNumber, "41426819")
@@ -73,15 +72,13 @@ func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
 func TestCreate_account_marshal_json_in_request(t *testing.T) {
 	client := NewMockClient()
 
-	mockRest.On("Post", "/v1/organisation/accounts", mock.AnythingOfType("string")).Return(accountResponse(), nil)
-
 	client.Create("GB", "400300", "GBDSC", "NWBKGB22")
-
-	const expected = `{"data":{"type":"accounts","id":"my-id","organisation_id":"634e3a41-26b8-49f9-a23d-26fa92061f38","attributes":{"country":"GB","base_currency":"GBP","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
-
-	mockRest.AssertCalled(t, "Post", "/v1/organisation/accounts", expected)
-
+	mockRest.AssertCalled(t, "Post", "/v1/organisation/accounts", expectedParam())
 	mock.AssertExpectationsForObjects(t, &mockRest)
+}
+
+func expectedParam() string {
+	return `{"data":{"type":"accounts","id":"my-id","organisation_id":"634e3a41-26b8-49f9-a23d-26fa92061f38","attributes":{"country":"GB","base_currency":"GBP","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
 }
 
 func accountResponse() string {
