@@ -35,6 +35,7 @@ func TestCreate_account_GB(t *testing.T) {
 	client := NewClient("http://localhost:8080", "634e3a41-26b8-49f9-a23d-26fa92061f38")
 
 	account, _ := client.Create("GB", "400300", "GBDSC", "NWBKGB22")
+
 	assert.NotNil(t, account.accountNumber)
 	assert.NotNil(t, account.IBAN)
 }

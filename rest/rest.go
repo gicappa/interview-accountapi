@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 // REST is meant to manage the requests at HTTP level
@@ -20,10 +21,26 @@ type DefaultREST struct {
 }
 
 // Post is calling the POST
-// TODO missing header handling
+// All requests to the Form3 API must include the following headers:
+// Host: api.form3.tech (note this is different when using the Staging Environment)
+// Date: [The date and time the request is made]
+// Accept: application/vnd.api+json
+// Requests that contain body also require the following headers:
+// Content-Type: application/vnd.api+json
+// Content-Length: [Length of the submitted content]
 func (o *DefaultREST) Post(uri, data string) (string, error) {
-	req := bytes.NewBuffer([]byte(data))
-	res, err := http.Post(o.BaseURL+uri, "application/vnd.api+json", req)
+	client := &http.Client{}
+
+	req, err := http.NewRequest("POST", o.BaseURL+uri, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Add("Date", time.Now().Format(time.RFC1123))
+	req.Header.Add("Accept", "application/vnd.api+json")
+	req.Header.Add("Content-Type", "application/vnd.api+json")
+
+	res, err := client.Do(req)
 
 	if err != nil {
 		log.Fatalf("ERROR|Post|%v", err)
