@@ -41,6 +41,7 @@ func TestCreate_account_GB(t *testing.T) {
 }
 
 // Micro/Unit tests
+// MockREST implements a REST interface with a mock implementation
 type MockREST struct {
 	mock.Mock
 }
