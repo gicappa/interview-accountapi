@@ -43,7 +43,7 @@ func (o *DefaultREST) Post(uri, data string) (string, error) {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Fatalf("ERROR|Post|%v", err)
+		log.Printf("ERROR|NetworkError|%v", err)
 		return "", err
 	}
 
@@ -51,15 +51,15 @@ func (o *DefaultREST) Post(uri, data string) (string, error) {
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatalf("ERROR|ReadBody|%v", err)
+		log.Printf("ERROR|StatusCode|%s|ReadBody|%v", fmt.Sprint(res.StatusCode), err)
 		return "", err
 	}
 
 	if res.StatusCode != 201 {
-		return "", errors.New("ERROR|StatusCode|" + fmt.Sprint(res.StatusCode) + "|Body|" + string(body))
+		log.Printf("ERROR|StatusCode|%s|ReadBody|%s", fmt.Sprint(res.StatusCode), string(body))
+		return "", errors.New(string(body))
 	}
 
-	log.Printf("INFO|%s", string(body))
-
+	log.Printf("INFO|StatusCode|%s|ReadBody|%s", fmt.Sprint(res.StatusCode), string(body))
 	return string(body), nil
 }

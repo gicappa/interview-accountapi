@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"errors"
 
 	r "github.com/gicappa/interview-accountapi/rest"
 	"github.com/google/uuid"
@@ -59,8 +60,13 @@ func (c *Client) Create(country, bankID, bankIDCode, BIC string) (a *Account, er
 	}
 
 	jsonResponse, err := c.Rest.Post(AccountURI, jsonRequest)
+
 	if err != nil {
-		return nil, err
+		if accountError, jsonErr := c.unmarshaError(err.Error()); jsonErr != nil {
+			return nil, jsonErr
+		} else {
+			return nil, errors.New(accountError.ErrorMessage)
+		}
 	}
 
 	ad, err := c.unmarshalResponse(jsonResponse)
@@ -104,6 +110,11 @@ func (c *Client) unmarshalResponse(jsonString string) (ad accountData, err error
 	err = json.Unmarshal([]byte(jsonString), &ad)
 
 	return ad, err
+}
+
+func (c *Client) unmarshaError(jsonString string) (ae AccountError, err error) {
+	err = json.Unmarshal([]byte(jsonString), &ae)
+	return ae, err
 }
 
 // Account is the data structure holding account data
@@ -158,4 +169,9 @@ type Data struct {
 	ID             string     `json:"id"`
 	OrganisationID string     `json:"organisation_id"`
 	Attributes     Attributes `json:"attributes"`
+}
+
+// Error response
+type AccountError struct {
+	ErrorMessage string `json:"error_message"`
 }

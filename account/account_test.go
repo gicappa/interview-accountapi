@@ -40,6 +40,15 @@ func TestCreate_account_GB(t *testing.T) {
 	assert.NotNil(t, account.IBAN)
 }
 
+func TestCreate_account_GB_with_error(t *testing.T) {
+	client := NewClient("http://localhost:8080", "634e3a41-26b8-49f9-a23d-26fa92061f38")
+
+	_, err := client.Create("??", "400300", "GBDSC", "NWBKGB22")
+
+	assert.NotNil(t, err, "error is nil but should not be empty")
+	assert.Contains(t, err.Error(), "country in body", "The error message is not reported")
+}
+
 // Micro/Unit tests
 // MockREST implements a REST interface with a mock implementation
 type MockREST struct {
