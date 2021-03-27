@@ -84,12 +84,13 @@ func (c *Client) CreateEx(accountReq *Account) (a *Account, err error) {
 }
 
 // Create is the simplified create method to create a n account
-func (c *Client) Create(country, bankID, bankIDCode, bic string) (a *Account, err error) {
+func (c *Client) Create(country, baseCurrency, bankID, bankIDCode, bic string) (a *Account, err error) {
 	account := &Account{
-		country:    country,
-		bankID:     bankID,
-		bankIDCode: bankIDCode,
-		bic:        bic,
+		country:      country,
+		baseCurrency: baseCurrency,
+		bankID:       bankID,
+		bankIDCode:   bankIDCode,
+		bic:          bic,
 	}
 	return c.CreateEx(account)
 }
