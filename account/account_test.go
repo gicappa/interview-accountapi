@@ -36,7 +36,7 @@ func TestCreate_account_GB(t *testing.T) {
 
 	account, _ := client.Create("GB", "GPB", "400300", "GBDSC", "NWBKGB22")
 
-	assert.NotNil(t, account.accountNumber)
+	assert.NotNil(t, account.AccountNumber)
 	assert.NotNil(t, account.IBAN)
 }
 
@@ -76,7 +76,7 @@ func TestCreate_account_unmarshal_json_in_response(t *testing.T) {
 	client := NewMockClient()
 
 	account, _ := client.Create("GB", "GPB", "400300", "GBDSC", "NWBKGB22")
-	assert.Equal(t, account.accountNumber, "41426819")
+	assert.Equal(t, account.AccountNumber, "41426819")
 	assert.Equal(t, account.IBAN, "GB11NWBK40030041426819")
 }
 
