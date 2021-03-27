@@ -103,7 +103,7 @@ func (c *Client) marshalReq(account *Account) (string, error) {
 			OrganisationID: c.OrganisationID,
 			Attributes: Attributes{
 				Country:      account.country,
-				BaseCurrency: "GBP",
+				BaseCurrency: account.baseCurrency,
 				BankID:       account.bankID,
 				BankIDCode:   account.bankIDCode,
 				Bic:          account.bic,
