@@ -53,49 +53,60 @@ func NewClient(baseURL, organisationID string) *Client {
 // left empty.
 // Note that a given bank_id and bic need to be registered
 // with Form3 and connected to your organisation ID.
-func (c *Client) Create(country, bankID, bankIDCode, BIC string) (a *Account, err error) {
-	jsonRequest, err := c.marshalRequest(country, bankID, bankIDCode, BIC)
+func (c *Client) CreateEx(accountReq *Account) (a *Account, err error) {
+	jsonReq, err := c.marshalReq(accountReq)
 	if err != nil {
 		return nil, err
 	}
 
-	jsonResponse, err := c.Rest.Post(AccountURI, jsonRequest)
+	jsonRes, err := c.Rest.Post(AccountURI, jsonReq)
 
 	if err != nil {
-		if accountError, jsonErr := c.unmarshaError(err.Error()); jsonErr != nil {
+		if accountErr, jsonErr := c.unmarshaErr(err.Error()); jsonErr != nil {
 			return nil, jsonErr
 		} else {
-			return nil, errors.New(accountError.ErrorMessage)
+			return nil, errors.New(accountErr.ErrorMessage)
 		}
 	}
 
-	ad, err := c.unmarshalResponse(jsonResponse)
+	ad, err := c.unmarshalRes(jsonRes)
 	if err != nil {
 		return nil, err
 	}
 
-	account := &Account{
+	accountRes := &Account{
 		accountNumber: ad.Data.Attributes.AccountNumber,
 		IBAN:          ad.Data.Attributes.Iban,
 		status:        ad.Data.Attributes.Status,
 	}
 
-	return account, err
+	return accountRes, err
 }
 
-// marshalRequest create a JSON string out of the request params
-func (c *Client) marshalRequest(country, bankID, bankIDCode, BIC string) (string, error) {
+// Create is the simplified create method to create a n account
+func (c *Client) Create(country, bankID, bankIDCode, bic string) (a *Account, err error) {
+	account := &Account{
+		country:    country,
+		bankID:     bankID,
+		bankIDCode: bankIDCode,
+		bic:        bic,
+	}
+	return c.CreateEx(account)
+}
+
+// marshalReq create a JSON string out of the request params
+func (c *Client) marshalReq(account *Account) (string, error) {
 	request := &Request{
 		Data: Data{
 			Type:           "accounts",
 			ID:             c.ID,
 			OrganisationID: c.OrganisationID,
 			Attributes: Attributes{
-				Country:      country,
+				Country:      account.country,
 				BaseCurrency: "GBP",
-				BankID:       bankID,
-				BankIDCode:   bankIDCode,
-				Bic:          BIC,
+				BankID:       account.bankID,
+				BankIDCode:   account.bankIDCode,
+				Bic:          account.bic,
 			},
 		},
 	}
@@ -105,24 +116,70 @@ func (c *Client) marshalRequest(country, bankID, bankIDCode, BIC string) (string
 	return string(requestString), err
 }
 
-// unmarshalResponse retuns a JSON string out of the request params
-func (c *Client) unmarshalResponse(jsonString string) (ad accountData, err error) {
+// unmarshalRes retuns a JSON string out of the request params
+func (c *Client) unmarshalRes(jsonString string) (ad accountData, err error) {
 	err = json.Unmarshal([]byte(jsonString), &ad)
 
 	return ad, err
 }
 
-func (c *Client) unmarshaError(jsonString string) (ae AccountError, err error) {
+func (c *Client) unmarshaErr(jsonString string) (ae AccountError, err error) {
 	err = json.Unmarshal([]byte(jsonString), &ae)
 	return ae, err
 }
 
 // Account is the data structure holding account data
 // coming from the APIs answers
+//
+// country	string ISO code
+// base_currency string ISO code
+// bank_id string, maximum length 11
+// bank_id_code string
+// account_number string
+// bic string, 8 or 11 character code
+// iban string
+// customer_id string
+// name array [4] of string [140]
+// alternative_names array [3] of string [140]
+// account_classification string
+// joint_account boolean
+// account_matching_opt_out boolean
+// secondary_identification string [140]
+// switched boolean
+// private_identification string
+// private_identification.birth_date string
+// private_identification.birth_country string
+// private_identification.identification string
+// private_identification.address array of string
+// private_identification.city string
+// private_identification.country string
+// organisation_identification string
+// organisation_identification.identification string
+// organisation_identification.address array of string
+// organisation_identification.city string
+// organisation_identification.country string
+// organisation_identification.actors.name array [4] of string [255]
+// organisation_identification.actors.birth_date string
+// organisation_identification.actors.residency string
+// relationships.master_account array
+// title string [40]
 type Account struct {
-	accountNumber string
-	status        string
-	IBAN          string
+	country                 string // ISO code
+	baseCurrency            string // ISO code
+	bankID                  string // maximum length 11
+	bankIDCode              string
+	accountNumber           string
+	bic                     string // 8 or 11 character code
+	IBAN                    string
+	customerID              string
+	status                  string
+	name                    [4]string // of string [140]
+	alternativeNames        [3]string // of string [140]
+	accountClassification   string
+	jointAccount            bool
+	accountMatchingOptOut   bool
+	secondaryIdentification string
+	switched                bool
 }
 
 // AccountData is a data structure that will contain

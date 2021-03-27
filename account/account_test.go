@@ -88,6 +88,14 @@ func TestCreate_account_marshal_json_in_request(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, &mockRest)
 }
 
+// func TestCreate_account_with_object(t *testing.T) {
+// 	client := NewMockClient()
+// 	accountObj := &Account{}
+// 	account, _ := client.CreateEx(accountObj)
+// 	assert.Equal(t, account.accountNumber, "41426819")
+// 	assert.Equal(t, account.IBAN, "GB11NWBK40030041426819")
+// }
+
 func expectedParam() string {
 	return `{"data":{"type":"accounts","id":"my-id","organisation_id":"634e3a41-26b8-49f9-a23d-26fa92061f38","attributes":{"country":"GB","base_currency":"GBP","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22"}}}`
 }
