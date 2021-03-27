@@ -69,17 +69,13 @@ func (c *Client) CreateEx(accountReq *Account) (accountRes *Account, err error) 
 		}
 	}
 
-	if res, err := c.unmarshalRes(jsonRes); err != nil {
+	accountDataRes, err := c.unmarshalRes(jsonRes)
+
+	if err != nil {
 		return nil, err
-	} else {
-		accountRes = &Account{
-			AccountNumber: res.Data.Attributes.AccountNumber,
-			IBAN:          res.Data.Attributes.IBAN,
-			Status:        res.Data.Attributes.Status,
-		}
-		return accountRes, nil
 	}
 
+	return accountDataRes.Data.Attributes, nil
 }
 
 // Create is the simplified create method to create a n account
@@ -96,12 +92,12 @@ func (c *Client) Create(country, baseCurrency, bankID, bankIDCode, bic string) (
 
 // marshalReq create a JSON string out of the request params
 func (c *Client) marshalReq(account *Account) (string, error) {
-	request := &accountData{
+	request := &AccountData{
 		Data{
 			Type:           "accounts",
 			ID:             c.ID,
 			OrganisationID: c.OrganisationID,
-			Attributes:     *account,
+			Attributes:     account,
 		},
 	}
 
@@ -110,94 +106,16 @@ func (c *Client) marshalReq(account *Account) (string, error) {
 	return string(requestString), err
 }
 
-// unmarshalRes retuns a JSON string out of the request params
-func (c *Client) unmarshalRes(jsonString string) (data accountData, err error) {
-	err = json.Unmarshal([]byte(jsonString), &data)
-	return data, err
+// unmarshalRes returns an object with the unmarshalled account data model
+// or an error occurred during unmarshalling
+func (c *Client) unmarshalRes(jsonString string) (accountData AccountData, err error) {
+	err = json.Unmarshal([]byte(jsonString), &accountData)
+	return accountData, err
 }
 
+// unmarshaErr returns an object with the unmarshalled account error model
+// or an error occurred during unmarshalling
 func (c *Client) unmarshaErr(jsonString string) (accountErr AccountError, err error) {
 	err = json.Unmarshal([]byte(jsonString), &accountErr)
 	return accountErr, err
-}
-
-// Account is the data structure holding account data
-// coming from the APIs answers
-//
-// country	string ISO code
-// base_currency string ISO code
-// bank_id string, maximum length 11
-// bank_id_code string
-// account_number string
-// bic string, 8 or 11 character code
-// iban string
-// customer_id string
-// name array [4] of string [140]
-// alternative_names array [3] of string [140]
-// account_classification string
-// joint_account boolean
-// account_matching_opt_out boolean
-// secondary_identification string [140]
-// switched boolean
-// private_identification string
-// private_identification.birth_date string
-// private_identification.birth_country string
-// private_identification.identification string
-// private_identification.address array of string
-// private_identification.city string
-// private_identification.country string
-// organisation_identification string
-// organisation_identification.identification string
-// organisation_identification.address array of string
-// organisation_identification.city string
-// organisation_identification.country string
-// organisation_identification.actors.name array [4] of string [255]
-// organisation_identification.actors.birth_date string
-// organisation_identification.actors.residency string
-// relationships.master_account array
-// title string [40]
-type Account struct {
-	Country                 string   `json:"country"`                 // ISO code
-	BaseCurrency            string   `json:"base_currency,omitempty"` // ISO code
-	BankID                  string   `json:"bank_id,omitempty"`       // maximum length 11
-	BankIDCode              string   `json:"bank_id_code,omitempty"`
-	AccountNumber           string   `json:"account_number,omitempty"`
-	BIC                     string   `json:"bic,omitempty"` // 8 or 11 character code
-	IBAN                    string   `json:"iban,omitempty"`
-	CustomerID              string   `json:"customer_id,omitempty"`
-	Status                  string   `json:"status,omitempty"`            // Only in responses
-	Name                    []string `json:"name,omitempty"`              // of string [140]
-	AlternativeNames        []string `json:"alternative_names,omitempty"` // of string [140]
-	AccountClassification   string   `json:"account_classification,omitempty"`
-	JointAccount            bool     `json:"joint_account,omitempty"`
-	AccountMatchingOptOut   bool     `json:"account_matching_opt_out,omitempty"`
-	SecondaryIdentification string   `json:"secondary_identification,omitempty"`
-	Switched                bool     `json:"switched,omitempty"`
-}
-
-// Request holds the request data
-type accountData struct {
-	Data Data `json:"data"`
-}
-
-// Attributes of the account
-type Attributes struct {
-	Country      string `json:"country"`
-	BaseCurrency string `json:"base_currency"`
-	BankID       string `json:"bank_id"`
-	BankIDCode   string `json:"bank_id_code"`
-	Bic          string `json:"bic"`
-}
-
-// Data of the account request
-type Data struct {
-	Type           string  `json:"type"`
-	ID             string  `json:"id"`
-	OrganisationID string  `json:"organisation_id"`
-	Attributes     Account `json:"attributes"`
-}
-
-// Error response
-type AccountError struct {
-	ErrorMessage string `json:"error_message"`
 }
