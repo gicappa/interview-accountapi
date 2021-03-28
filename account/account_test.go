@@ -92,7 +92,7 @@ func TestCreate_account_marshal_json_in_request(t *testing.T) {
 }
 
 func expectedParam() string {
-	return `{"data":{"type":"accounts","id":"my-id","organisation_id":"634e3a41-26b8-49f9-a23d-26fa92061f38","attributes":{"country":"GB","base_currency":"GPB","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22","iban":"GB11NWBK40030041426819"}}}`
+	return `{"data":{"id":"my-id","organisation_id":"634e3a41-26b8-49f9-a23d-26fa92061f38","type":"accounts","attributes":{"country":"GB","base_currency":"GPB","bank_id":"400300","bank_id_code":"GBDSC","bic":"NWBKGB22","iban":"GB11NWBK40030041426819"}}}`
 }
 
 func accountResponse() string {

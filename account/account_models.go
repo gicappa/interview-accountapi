@@ -9,9 +9,10 @@ type AccountData struct {
 
 // Data of the account request
 type Data struct {
-	Type           string   `json:"type"`
 	ID             string   `json:"id"`
 	OrganisationID string   `json:"organisation_id"`
+	Type           string   `json:"type"`
+	Version        int      `json:"version,omitempty"`
 	Attributes     *Account `json:"attributes"`
 }
 
